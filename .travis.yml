@@ -32,6 +32,7 @@ _apt_pkgs: &_apt_pkgs
   - 'lcov'
   - 'cppcheck'
   - 'clang-format-9'
+  - 'python3-pip'
 
 _apt_srcs: &_apt_srcs
   - 'ubuntu-toolchain-r-test'
@@ -157,6 +158,9 @@ before_install:
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
+  # Install Meson >=0.57.0
+  - export PATH=$HOME/.local/bin:$PATH
+  - pip3 install -qqq --user --ignore-installed meson
 
 before_script:
   - export CXX=${COMPILER}
@@ -176,7 +180,7 @@ before_script:
   - service --status-all || true
   - initctl list || true
 
-  # Debug build
+  # CMake debug build
   - cmake -H.
     -BBuild-Debug
     -DCMAKE_BUILD_TYPE=Debug
@@ -184,7 +188,7 @@ before_script:
     -DPISTACHE_BUILD_TESTS=true
     -DPISTACHE_USE_SSL=true
 
-  # Debug build, no SSL
+  # CMake debug build, no SSL
   - cmake -H.
     -BBuild-Debug-nossl
     -DCMAKE_BUILD_TYPE=Debug
@@ -192,27 +196,58 @@ before_script:
     -DPISTACHE_BUILD_TESTS=true
     -DPISTACHE_USE_SSL=false
 
-  # Release build
+  # CMake release build
   - cmake -H.
     -BBuild-Release
     -DCMAKE_BUILD_TYPE=Release
+    -DPISTACHE_USE_SSL=true
+
+  # Meson debug build
+  - meson setup meson_build_debug
+    --buildtype=debug
+    -DPISTACHE_PROFILE=true
+    -DPISTACHE_BUILD_TESTS=true
+    -DPISTACHE_BUILD_EXAMPLES=true
+    -DPISTACHE_USE_SSL=true
+
+  # Meson debug build, no SSL
+  - meson setup meson_build_debug_nossl
+    --buildtype=debug
+    -DPISTACHE_PROFILE=true
+    -DPISTACHE_BUILD_TESTS=true
+    -DPISTACHE_BUILD_EXAMPLES=true
+    -DPISTACHE_USE_SSL=false
+
+  # Meson release build
+  - meson setup meson_build_release
+    --buildtype=release
     -DPISTACHE_USE_SSL=true
 
 script:
   # Set the ulimit
   - ulimit -c unlimited -S
 
-  # Debug build
+  # CMake debug build
   - cd Build-Debug
   - make -j 2 all test ARGS="-V"
 
-  # Debug build, no SSL
+  # CMake debug build, no SSL
   - cd ../Build-Debug-nossl
   - make -j 2 all test ARGS="-V"
 
-  # Release build
+  # CMake release build
   - cd ../Build-Release
   - make -j 2
+  - cd ..
+
+  # Meson debug build
+  - meson compile -C meson_build_debug
+
+  # Meson debug build, no SSL
+  - meson compile -C meson_build_debug_nossl
+
+  # Meson release build
+  - meson compile -C meson_build_release
 
 after_failure:
   - CRASHFILES=$(find /var/crash/ -mindepth 1 -maxdepth 1 -print)
