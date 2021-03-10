@@ -1,6 +1,3 @@
-curl_dep = dependency('libcurl', required: true)
-gtest_main_dep = dependency('gtest', main: true, required: true, fallback: ['gtest', 'gtest_main_dep'])
-
 valgrind = find_program('valgrind', required: false)
 gcov = find_program('gcov', required: false)
 cppcheck = find_program('cppcheck', required: false)
@@ -47,5 +44,19 @@ if get_option('PISTACHE_USE_SSL')
 endif
 
 foreach test_name : pistache_test_files
-	test(test_name, executable('run_'+test_name, test_name+'.cc', dependencies: [pistache_shared_dep, gtest_main_dep, curl_dep]), timeout: 60, workdir: meson.current_build_dir(), is_parallel: false)
+	test(
+		test_name,
+		executable(
+			'run_'+test_name,
+			test_name+'.cc',
+			dependencies: [
+				pistache_shared_dep,
+				dependency('gtest', main: true, fallback: ['gtest', 'gtest_main_dep']),
+				dependency('libcurl')
+			]
+		),
+		timeout: 60,
+		workdir: meson.current_build_dir(),
+		is_parallel: false
+	)
 endforeach

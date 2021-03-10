@@ -208,7 +208,7 @@ before_script:
   # Meson debug build
   - meson setup meson_build_debug
     --buildtype=debug
-    -DPISTACHE_PROFILE=true
+    -Db_coverage=true
     -DPISTACHE_BUILD_TESTS=true
     -DPISTACHE_BUILD_EXAMPLES=true
     -DPISTACHE_USE_SSL=true
@@ -216,7 +216,7 @@ before_script:
   # Meson debug build, no SSL
   - meson setup meson_build_debug_nossl
     --buildtype=debug
-    -DPISTACHE_PROFILE=true
+    -Db_coverage=true
     -DPISTACHE_BUILD_TESTS=true
     -DPISTACHE_BUILD_EXAMPLES=true
     -DPISTACHE_USE_SSL=false

@@ -22,7 +22,7 @@ pc_libs = ['-lpistache', '-pthread']
 # No need for -Wall -Wextra -Wpedantic, since warning_level is 3
 add_project_arguments(compiler.get_supported_arguments(['-Wconversion', '-Wno-missing-field-initializers']), language: 'cpp')
 
-if get_option('PISTACHE_PROFILE')
+if get_option('b_coverage')
 	add_global_arguments(compiler.get_supported_arguments(['-fprofile-arcs', '-ftest-coverage', '-fstack-protector-all', '--param=ssp-buffer-size=4']), language: 'cpp')
 endif
 
