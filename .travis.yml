@@ -1,7 +1,7 @@
 language: cpp
 
 os: linux
-dist: bionic
+dist: focal
 
 branches:
   only:
@@ -84,7 +84,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-          - ['llvm-toolchain-bionic-6.0']
+          - ['llvm-toolchain-6.0']
         packages: 
           - *_apt_pkgs
           - ['clang-6.0', 'llvm-6.0-tools', 'libstdc++-6-dev']
@@ -95,7 +95,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-          - ['llvm-toolchain-bionic-7']
+          - ['llvm-toolchain-7']
         packages:
           - *_apt_pkgs
           - ['clang-7', 'llvm-7-tools', 'libstdc++-7-dev']
@@ -106,7 +106,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-          - ['llvm-toolchain-bionic-8']
+          - ['llvm-toolchain-8']
         packages:
           - *_apt_pkgs
           - ['clang-8', 'llvm-8-tools', 'libstdc++-8-dev']
@@ -117,7 +117,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-          - ['llvm-toolchain-bionic-9']
+          - ['llvm-toolchain-9']
         packages:
           - *_apt_pkgs
           - ['clang-9', 'llvm-9-tools', 'libstdc++-8-dev']
@@ -128,7 +128,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-          - ['llvm-toolchain-bionic-10']
+          - ['llvm-toolchain-10']
         packages:
           - *_apt_pkgs
           - ['clang-10', 'llvm-10-tools', 'libstdc++-8-dev']
