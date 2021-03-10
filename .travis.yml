@@ -263,17 +263,13 @@ script:
   - ulimit -c unlimited -S
 
   # CMake debug build
-  - cd Build-Debug
-  - make -j 2 all test ARGS="-V"
+  - make -C Build-Debug --jobs 2 all test ARGS="-V"
 
   # CMake debug build, no SSL
-  - cd ../Build-Debug-nossl
-  - make -j 2 all test ARGS="-V"
+  - make -C Build-Debug-nossl --jobs 2 all test ARGS="-V"
 
   # CMake release build
-  - cd ../Build-Release
-  - make -j 2
-  - cd ..
+  - make -C Build-Release --jobs 2
 
   # Meson debug build
   - meson compile -C meson_build_debug --jobs 2
@@ -294,7 +290,6 @@ after_failure:
     if [ -n "$CRASHFILES" ]; then echo "$CRASHFILES" | while IFS= read -r CRASH; do echo "Crash report: $CRASH"; DIR="/tmp/$(basename $CRASH).d"; apport-unpack "$CRASH" "$DIR"; EXE=$(cat $DIR/ExecutablePath); CORE="$DIR/CoreDump"; echo "Coredump $CORE for $EXE"; /usr/bin/gdb $EXE $CORE -ex "thread apply all bt" -ex "set pagination 0" -batch; done; fi
 
 after_success:
-  - cd ../Build-Debug
   - sudo su -c "echo 'if [ \"\$1\" = \"-v\" ] ; then $COV_TOOL --version ; else $COV_TOOL $COV_TOOL_ARGS \$@ ; fi' > /usr/local/bin/cov-tool" && sudo chmod +x /usr/local/bin/cov-tool
   - lcov --capture --gcov-tool cov-tool --directory . --output-file coverage.info
   - lcov --remove coverage.info '/usr/*' '*tests/*' '*third-party/*' --output-file coverage.info

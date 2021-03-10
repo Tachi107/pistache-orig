@@ -56,8 +56,8 @@ if (PISTACHE_BUILD_TESTS)
             APPEND CMAKE_CXX_CPPCHECK
                 "--enable=all"
                 "-DCPPCHECK"
-                "--suppress=*:${PROJECT_SOURCE_DIR}/third-party*"
-                "--suppress=*:${PROJECT_SOURCE_DIR}/tests*"
+                "--suppress=*:${PROJECT_SOURCE_DIR}/third-party/*"
+                "--suppress=*:${PROJECT_SOURCE_DIR}/tests/*"
                 "--suppress=noExplicitConstructor:include/pistache/optional.h"
         )
     else()
