@@ -19,7 +19,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 include(CheckAtomic)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
-    add_compile_options(-g -Og -ftest-coverage -fstack-protector-all --param=ssp-buffer-size=4)
+    add_compile_options(-g -Og --coverage -fstack-protector-all --param=ssp-buffer-size=4)
 endif()
 
 option(BUILD_SHARED_LIBS "build shared library" ON)
