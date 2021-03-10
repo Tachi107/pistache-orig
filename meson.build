@@ -23,7 +23,7 @@ pc_libs = ['-lpistache', '-pthread']
 add_project_arguments(compiler.get_supported_arguments(['-Wconversion', '-Wno-missing-field-initializers']), language: 'cpp')
 
 if get_option('b_coverage')
-	add_global_arguments(compiler.get_supported_arguments(['-fprofile-arcs', '-ftest-coverage', '-fstack-protector-all', '--param=ssp-buffer-size=4']), language: 'cpp')
+	add_global_arguments(compiler.get_supported_arguments(['--coverage', '-fstack-protector-all', '--param=ssp-buffer-size=4']), language: 'cpp')
 endif
 
 ##### BEGIN CheckAtomic.cmake
