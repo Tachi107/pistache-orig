@@ -20,6 +20,7 @@ include(CheckAtomic)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
     add_compile_options(-g -Og --coverage -fstack-protector-all --param=ssp-buffer-size=4)
+    add_link_options(--coverage)
 endif()
 
 option(BUILD_SHARED_LIBS "build shared library" ON)

@@ -22,8 +22,9 @@ pc_libs = ['-lpistache', '-pthread']
 # No need for -Wall -Wextra -Wpedantic, since warning_level is 3
 add_project_arguments(compiler.get_supported_arguments(['-Wconversion', '-Wno-missing-field-initializers']), language: 'cpp')
 
+# No need for --coverage, since b_coverage is set
 if get_option('b_coverage')
-	add_global_arguments(compiler.get_supported_arguments(['--coverage', '-fstack-protector-all', '--param=ssp-buffer-size=4']), language: 'cpp')
+	add_global_arguments(compiler.get_supported_arguments(['-fstack-protector-all', '--param=ssp-buffer-size=4']), language: 'cpp')
 endif
 
 ##### BEGIN CheckAtomic.cmake
