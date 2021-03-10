@@ -244,13 +244,13 @@ script:
   - cd ..
 
   # Meson debug build
-  - meson compile -C meson_build_debug
+  - meson compile -C meson_build_debug --jobs 2
 
   # Meson debug build, no SSL
-  - meson compile -C meson_build_debug_nossl
+  - meson compile -C meson_build_debug_nossl --jobs 2
 
   # Meson release build
-  - meson compile -C meson_build_release
+  - meson compile -C meson_build_release --jobs 2
 
 after_failure:
   - CRASHFILES=$(find /var/crash/ -mindepth 1 -maxdepth 1 -print)
