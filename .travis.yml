@@ -35,6 +35,7 @@ _apt_pkgs: &_apt_pkgs
   - 'python3-pip'
   - 'python3-setuptools'
   - 'ninja-build'
+  - 'libblocksruntime-dev'
 
 _apt_srcs: &_apt_srcs
   - 'ubuntu-toolchain-r-test'
@@ -162,7 +163,7 @@ install:
   - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
   # Install Meson >=0.57.0
   - export PATH=$HOME/.local/bin:$PATH
-  - pip3 install -vvv --user --ignore-installed meson
+  - pip3 install -qqq --user --ignore-installed meson
 
 before_script:
   - export CXX=${COMPILER}
