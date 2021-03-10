@@ -40,19 +40,29 @@ _apt_pkgs: &_apt_pkgs
 _apt_srcs: &_apt_srcs
   - 'ubuntu-toolchain-r-test'
 
-_env_clang_4: &_env_clang_4
-  - COMPILER=clang++-4.0
-  - COV_TOOL=llvm-cov-4.0
-  - COV_TOOL_ARGS=gcov
-
-_env_clang_5: &_env_clang_5
-  - COMPILER=clang++-5.0
-  - COV_TOOL=llvm-cov-5.0
-  - COV_TOOL_ARGS=gcov
-
 _env_clang_6: &_env_clang_6
   - COMPILER=clang++-6.0
   - COV_TOOL=llvm-cov-6.0
+  - COV_TOOL_ARGS=gcov
+
+_env_clang_7: &_env_clang_7
+  - COMPILER=clang++-7
+  - COV_TOOL=llvm-cov-7
+  - COV_TOOL_ARGS=gcov
+
+_env_clang_8: &_env_clang_8
+  - COMPILER=clang++-8
+  - COV_TOOL=llvm-cov-8
+  - COV_TOOL_ARGS=gcov
+
+_env_clang_9: &_env_clang_9
+  - COMPILER=clang++-9
+  - COV_TOOL=llvm-cov-9
+  - COV_TOOL_ARGS=gcov
+
+_env_clang_10: &_env_clang_10
+  - COMPILER=clang++-10
+  - COV_TOOL=llvm-cov-10
   - COV_TOOL_ARGS=gcov
 
 _env_gcc_7: &_env_gcc_7
@@ -69,28 +79,6 @@ jobs:
   include:
   # Linux clang builds
   - arch: amd64
-    env: *_env_clang_4
-    addons:
-      apt:
-        sources: 
-          - *_apt_srcs
-          - ['llvm-toolchain-bionic-4.0']
-        packages: 
-          - *_apt_pkgs
-          - ['clang-4.0', 'llvm-4.0-tools', 'libstdc++-6-dev']
-
-  - arch: amd64
-    env: *_env_clang_5
-    addons:
-      apt:
-        sources:
-          - *_apt_srcs
-          - ['llvm-toolchain-bionic-5.0', 'fish']
-        packages: 
-          - *_apt_pkgs
-          - ['clang-5.0', 'llvm-5.0-tools', 'libstdc++-6-dev']
-
-  - arch: amd64
     env: *_env_clang_6
     addons:
       apt:
@@ -100,6 +88,50 @@ jobs:
         packages: 
           - *_apt_pkgs
           - ['clang-6.0', 'llvm-6.0-tools', 'libstdc++-6-dev']
+
+  - arch: amd64
+    env: *_env_clang_7
+    addons:
+      apt:
+        sources:
+          - *_apt_srcs
+          - ['llvm-toolchain-bionic-7']
+        packages:
+          - *_apt_pkgs
+          - ['clang-7', 'llvm-7-tools', 'libstdc++-7-dev']
+
+  - arch: amd64
+    env: *_env_clang_8
+    addons:
+      apt:
+        sources:
+          - *_apt_srcs
+          - ['llvm-toolchain-bionic-8']
+        packages:
+          - *_apt_pkgs
+          - ['clang-8', 'llvm-8-tools', 'libstdc++-8-dev']
+
+  - arch: amd64
+    env: *_env_clang_9
+    addons:
+      apt:
+        sources:
+          - *_apt_srcs
+          - ['llvm-toolchain-bionic-9']
+        packages:
+          - *_apt_pkgs
+          - ['clang-9', 'llvm-9-tools', 'libstdc++-8-dev']
+
+  - arch: amd64
+    env: *_env_clang_10
+    addons:
+      apt:
+        sources:
+          - *_apt_srcs
+          - ['llvm-toolchain-bionic-10']
+        packages:
+          - *_apt_pkgs
+          - ['clang-10', 'llvm-10-tools', 'libstdc++-8-dev']
 
   # Linux GCC builds
   - arch: amd64
@@ -268,4 +300,3 @@ after_success:
   - lcov --remove coverage.info '/usr/*' '*tests/*' '*third-party/*' --output-file coverage.info
   - lcov --list coverage.info
   - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
-
