@@ -75,6 +75,16 @@ _env_gcc_8: &_env_gcc_8
   - COV_TOOL=gcov-8
   - COV_TOOL_ARGS=
 
+_env_gcc_9: &_env_gcc_9
+  - COMPILER=g++-9
+  - COV_TOOL=gcov-9
+  - COV_TOOL_ARGS=
+
+_env_gcc_10: &_env_gcc_10
+  - COMPILER=g++-10
+  - COV_TOOL=gcov-10
+  - COV_TOOL_ARGS=
+
 jobs:
   include:
   # Linux clang builds
@@ -87,7 +97,7 @@ jobs:
           - ['llvm-toolchain-6.0']
         packages: 
           - *_apt_pkgs
-          - ['clang-6.0', 'llvm-6.0-tools', 'libstdc++-6-dev']
+          - ['clang-6.0', 'llvm-6.0-tools', 'libstdc++-7-dev']
 
   - arch: amd64
     env: *_env_clang_7
@@ -120,7 +130,7 @@ jobs:
           - ['llvm-toolchain-9']
         packages:
           - *_apt_pkgs
-          - ['clang-9', 'llvm-9-tools', 'libstdc++-8-dev']
+          - ['clang-9', 'llvm-9-tools', 'libstdc++-9-dev']
 
   - arch: amd64
     env: *_env_clang_10
@@ -131,7 +141,7 @@ jobs:
           - ['llvm-toolchain-10']
         packages:
           - *_apt_pkgs
-          - ['clang-10', 'llvm-10-tools', 'libstdc++-8-dev']
+          - ['clang-10', 'llvm-10-tools', 'libstdc++-10-dev']
 
   # Linux GCC builds
   - arch: amd64
@@ -153,6 +163,26 @@ jobs:
         packages: 
           - *_apt_pkgs
           - ['g++-8']
+
+  - arch: amd64
+    env: *_env_gcc_9
+    addons:
+      apt:
+        sources:
+          - *_apt_srcs
+        packages: 
+          - *_apt_pkgs
+          - ['g++-9']
+
+  - arch: amd64
+    env: *_env_gcc_10
+    addons:
+      apt:
+        sources:
+          - *_apt_srcs
+        packages: 
+          - *_apt_pkgs
+          - ['g++-10']
 
   - arch: ppc64le
     env: *_env_gcc_8
