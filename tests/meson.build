@@ -54,8 +54,8 @@ foreach test_name : pistache_test_files
 			test_name+'.cc',
 			dependencies: [
 				pistache_shared_dep,
-				dependency('gtest', main: true, fallback: ['gtest', 'gtest_main_dep']),
-				dependency('libcurl')
+				gtest_main_dep,
+				curl_dep
 			]
 		),
 		timeout: 60,
