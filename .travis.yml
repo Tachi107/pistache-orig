@@ -302,10 +302,10 @@ script:
   - make -C Build-Release --jobs 2
 
   # Meson debug build
-  - meson compile -C meson_build_debug --jobs 2
+  - meson test -C meson_build_debug --jobs 2
 
   # Meson debug build, no SSL
-  - meson compile -C meson_build_debug_nossl --jobs 2
+  - meson test -C meson_build_debug_nossl --jobs 2
 
   # Meson release build
   - meson compile -C meson_build_release --jobs 2
