@@ -1,3 +1,6 @@
+curl_dep = dependency('libcurl', required: true)
+gtest_main_dep = dependency('gtest', main: true, required: true, fallback: ['gtest', 'gtest_main_dep'])
+
 valgrind = find_program('valgrind', required: false)
 gcov = find_program('gcov', required: false)
 cppcheck = find_program('cppcheck', required: false)
