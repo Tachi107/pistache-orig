@@ -5,4 +5,4 @@ option('PISTACHE_BUILD_DOCS', type: 'boolean', value: false, description: 'build
 option('PISTACHE_INSTALL', type: 'boolean', value: true, description: 'add pistache as install target (recommended)')
 option('PISTACHE_USE_SSL', type: 'boolean', value: false, description: 'add support for SSL server')
 option('PISTACHE_PIC', type: 'boolean', value: true, description: 'enable pistache PIC')
-option('PISTACHE_PROFILE', type: 'boolean', value: false, description: 'enable profiling flags (used in CI)')
+# Maybe use b_pie and/or b_staticpic instead of PISTACHE_PIC
