@@ -5,7 +5,7 @@ dist: focal
 
 branches:
   only:
-    - meson-test
+    - master
 
 # Note that we're not making use of the matrix expansion that Travis provides -
 # it doesn't work very well for our collection of builds that each require a
@@ -41,47 +41,56 @@ _apt_srcs: &_apt_srcs
   - 'ubuntu-toolchain-r-test'
 
 _env_clang_6: &_env_clang_6
-  - COMPILER=clang++-6.0
+  - CC=clang-6.0
+  - CXX=clang++-6.0
   - COV_TOOL=llvm-cov-6.0
   - COV_TOOL_ARGS=gcov
 
 _env_clang_7: &_env_clang_7
-  - COMPILER=clang++-7
+  - CC=clang-7
+  - CXX=clang++-7
   - COV_TOOL=llvm-cov-7
   - COV_TOOL_ARGS=gcov
 
 _env_clang_8: &_env_clang_8
-  - COMPILER=clang++-8
+  - CC=clang-8
+  - CXX=clang++-8
   - COV_TOOL=llvm-cov-8
   - COV_TOOL_ARGS=gcov
 
 _env_clang_9: &_env_clang_9
-  - COMPILER=clang++-9
+  - CC=clang-9
+  - CXX=clang++-9
   - COV_TOOL=llvm-cov-9
   - COV_TOOL_ARGS=gcov
 
 _env_clang_10: &_env_clang_10
-  - COMPILER=clang++-10
+  - CC=clang-10
+  - CXX=clang++-10
   - COV_TOOL=llvm-cov-10
   - COV_TOOL_ARGS=gcov
 
 _env_gcc_7: &_env_gcc_7
-  - COMPILER=g++-7
+  - CC=gcc-7
+  - CXX=g++-7
   - COV_TOOL=gcov-7
   - COV_TOOL_ARGS=
 
 _env_gcc_8: &_env_gcc_8
-  - COMPILER=g++-8
+  - CC=gcc-8
+  - CXX=g++-8
   - COV_TOOL=gcov-8
   - COV_TOOL_ARGS=
 
 _env_gcc_9: &_env_gcc_9
-  - COMPILER=g++-9
+  - CC=gcc-9
+  - CXX=g++-9
   - COV_TOOL=gcov-9
   - COV_TOOL_ARGS=
 
 _env_gcc_10: &_env_gcc_10
-  - COMPILER=g++-10
+  - CC=gcc-10
+  - CXX=g++-10
   - COV_TOOL=gcov-10
   - COV_TOOL_ARGS=
 
@@ -170,7 +179,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-        packages: 
+        packages:
           - *_apt_pkgs
           - ['g++-9']
 
@@ -180,7 +189,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-        packages: 
+        packages:
           - *_apt_pkgs
           - ['g++-10']
 
@@ -228,7 +237,6 @@ install:
   - pip3 install -qqq --user --ignore-installed meson
 
 before_script:
-  - export CXX=${COMPILER}
   - cd ${TRAVIS_BUILD_DIR}
 
   # Enable core dumps
