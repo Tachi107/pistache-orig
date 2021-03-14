@@ -104,7 +104,7 @@ jobs:
         sources:
           - *_apt_srcs
           - ['llvm-toolchain-6.0']
-        packages: 
+        packages:
           - *_apt_pkgs
           - ['clang-6.0', 'llvm-6.0-tools', 'libstdc++-7-dev']
 
@@ -159,7 +159,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-        packages: 
+        packages:
           - *_apt_pkgs
           - ['g++-7']
 
@@ -169,7 +169,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-        packages: 
+        packages:
           - *_apt_pkgs
           - ['g++-8']
 
@@ -199,7 +199,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-        packages: 
+        packages:
           - *_apt_pkgs
           - ['g++-8']
 
@@ -209,7 +209,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-        packages: 
+        packages:
           - *_apt_pkgs
           - ['g++-8']
 
@@ -219,7 +219,7 @@ jobs:
       apt:
         sources:
           - *_apt_srcs
-        packages: 
+        packages:
           - *_apt_pkgs
           - ['g++-8']
 

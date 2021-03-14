@@ -42,4 +42,3 @@ install_headers([
 ], subdir: 'pistache')
 
 install_subdir('thirdparty', install_dir: prefix/get_option('includedir')/'pistache')
-
