@@ -36,7 +36,7 @@ libpistache_static = static_library(
 	include_directories: incl_pistache,
 	dependencies: deps_libpistache,
 	install: get_option('PISTACHE_INSTALL'),
-	pic: get_option('PISTACHE_PIC')
+	pic: get_option('b_staticpic')
 )
 libpistache_shared = shared_library(
 	'pistache',	pistache_common_src+pistache_server_src+pistache_client_src,
