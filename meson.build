@@ -1,7 +1,7 @@
 project(
 	'pistache',
 	'cpp',
-	version: '0.0.0',
+	version: '0.0.2',
 	license: 'Apache-2.0',
 	default_options: [
 		'cpp_std=c++17',
