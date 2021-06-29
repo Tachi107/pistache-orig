@@ -50,9 +50,7 @@ jobs:
         sudo tar --extract --file=$HOME/autopkgtest-master.tar --directory=/usr/local/bin --strip-components=2 autopkgtest-master/tools/autopkgtest-build-qemu autopkgtest-master/virt/autopkgtest-virt-qemu
 
     - name: Build image
-      run: |
-        which autopkgtest-build-qemu
-        sudo autopkgtest-build-qemu --size 12G --architecture ${{ matrix.arch }} testing $HOME/autopkgtest-testing.img
+      run: sudo autopkgtest-build-qemu --size 12G --architecture ${{ matrix.arch }} --boot efi testing $HOME/autopkgtest-testing.img
 
     - name: Build Debian package
       run: |
