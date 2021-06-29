@@ -60,4 +60,4 @@ jobs:
     # The increased timeout is needed because the CI can be too slow to boot
     # the image.
     - name: Run autopkgtest
-      run: autopkgtest ../pistache_*.dsc -- qemu --timeout-reboot=120 $HOME/autopkgtest-testing.img
+      run: autopkgtest ../pistache_*.dsc -- /usr/local/bin/autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 $HOME/autopkgtest-testing.img
