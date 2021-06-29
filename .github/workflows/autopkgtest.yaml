@@ -46,7 +46,7 @@ jobs:
 
     - name: Install autopkgtest from source
       run: |
-        curl --silent --remote-name --output-dir $HOME --proto https --proto-default https --tlsv1.3 --http2-prior-knowledge https://salsa.debian.org/ci-team/autopkgtest/-/archive/master/autopkgtest-master.tar
+        curl --silent --output $HOME/autopkgtest-master.tar --proto https --proto-default https --tlsv1.3 --http2-prior-knowledge https://salsa.debian.org/ci-team/autopkgtest/-/archive/master/autopkgtest-master.tar
         sudo tar --extract --file=$HOME/autopkgtest-master.tar --directory=/usr/local/bin --strip-components=2 autopkgtest-master/tools/autopkgtest-build-qemu autopkgtest-master/virt/autopkgtest-virt-qemu
 
     - name: Build image
