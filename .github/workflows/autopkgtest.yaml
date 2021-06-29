@@ -7,6 +7,8 @@ name: autopkgtest
 on:
   [push, pull_request]
 
+# The default Debian shell (dash) is faster than bash at running scripts, and
+# using bash when it is not needed doesn't make sense.
 defaults:
   run:
     shell: sh
@@ -15,22 +17,49 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ amd64, arm64, armhf, i386, ppc64el, s390x ]
+
     steps:
     - uses: actions/checkout@v2
 
+    # The Debian repository is needed by autopkgtest-build-qemu when building
+    # for foreign architectures, since the tool tries to install
+    # linux-image-${{ matrix.arch }}, that is unavailable on Ubuntu; adding
+    # the Debian Testing repo and lowering its priority solves the issue
+    # while not risking to break the system mixing Debian and Ubuntu pkgs.
+    # The pgp key required to use the repository is downloaded through the
+    # debain-archive-keyring package, and instead of using the deprecated
+    # apt-key utility to add the keyring to the trusted ones I use the
+    # Signed-By option (deb822 source format), as recommended in the Debian
+    # wiki (https://wiki.debian.org/DebianRepository/UseThirdParty).
     - name: Install dependencies
       run: |
+        sudo apt -qq install debian-archive-keyring
+        printf 'Enabled: yes\nTypes: deb\nURIs: http://deb.debian.org/debian/\nSuites: testing\nComponents: main\nSigned-By: /usr/share/keyrings/debian-archive-keyring.gpg\n' | sudo tee /etc/apt/sources.list.d/debian.sources
+        printf 'Package: *\nPin: release o=testing\nPin-Priority: 400\n' | sudo tee /etc/apt/preferences.d/99debian-testing
         sudo apt -qq update
-        sudo apt -qq install autopkgtest genisoimage qemu-system vmdb2 meson cppcheck debhelper-compat dh-exec libc6-dev libcurl4-openssl-dev libgtest-dev libssl-dev libstdc++6 lintian pkg-config rapidjson-dev valgrind devscripts --no-install-recommends
+        sudo apt -qq install autopkgtest genisoimage qemu-system vmdb2 devscripts --no-install-recommends qemu-user-static qemu-efi-aarch64 qemu-efi-arm ovmf && sudo apt-mark auto qemu-user-static qemu-efi-aarch64 qemu-efi-arm ovmf
+        sudo apt -qq build-dep .
+
+    - name: Install autopkgtest from source
+      run: |
+        curl --silent --remote-name --output-dir $HOME --proto https --proto-default https --tlsv1.3 --http2-prior-knowledge https://salsa.debian.org/ci-team/autopkgtest/-/archive/master/autopkgtest-master.tar
+        sudo tar --extract --file=$HOME/autopkgtest-master.tar --directory=/usr/local/bin --strip-components=2 autopkgtest-master/tools/autopkgtest-build-qemu autopkgtest-master/virt/autopkgtest-virt-qemu
 
     - name: Build image
       run: |
-        sudo autopkgtest-build-qemu --size 12G testing $HOME/autopkgtest-testing.img
+        which autopkgtest-build-qemu
+        sudo autopkgtest-build-qemu --size 12G --architecture ${{ matrix.arch }} testing $HOME/autopkgtest-testing.img
 
     - name: Build Debian package
       run: |
         ./debian/rules get-orig-source
-        debuild -S -sa -uc -us
+        debuild --build=source --unsigned-source --unsigned-changes -sa
 
+    # The increased timeout is needed because the CI can be too slow to boot
+    # the image.
     - name: Run autopkgtest
       run: autopkgtest ../pistache_*.dsc -- qemu --timeout-reboot=120 $HOME/autopkgtest-testing.img
