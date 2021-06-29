@@ -52,6 +52,7 @@ jobs:
     - name: Build image
       run: |
         sudo rm /etc/apt/preferences.d/99debian-testing
+        sudo apt update
         cd $HOME/autopkgtest-master
         sudo ./tools/autopkgtest-build-qemu --size 12G --architecture ${{ matrix.arch }} testing $HOME/autopkgtest-testing.img
         cd -
