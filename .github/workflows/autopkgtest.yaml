@@ -55,7 +55,7 @@ jobs:
     - name: Build Debian package
       run: |
         ./debian/rules get-orig-source
-        debuild --build=source -sa --unsigned-source --unsigned-changes
+        debuild --build=source -sa --unsigned-changes --unsigned-source
 
     # The increased timeout is needed because the CI can be too slow to boot
     # the image.
