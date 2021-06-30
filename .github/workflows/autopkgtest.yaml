@@ -42,23 +42,22 @@ jobs:
         printf 'Package: *\nPin: release release o=Debian,a=testing\nPin-Priority: 400\n' | sudo tee /etc/apt/preferences.d/99debian-testing
         sudo apt update
         sudo apt-mark hold qemu-system-gui
-        sudo apt install autopkgtest genisoimage qemu-system vmdb2/testing devscripts qemu-user-static/testing && sudo apt-mark auto qemu-user-static
+        sudo apt install genisoimage qemu-system vmdb2/testing devscripts qemu-user-static/testing && sudo apt-mark auto qemu-user-static
         sudo apt build-dep .
 
     - name: Install autopkgtest from source
       run: |
         curl --silent --output $HOME/autopkgtest-master.tar --proto https --proto-default https --tlsv1.3 --http2-prior-knowledge https://salsa.debian.org/ci-team/autopkgtest/-/archive/master/autopkgtest-master.tar
         sudo tar --extract --file=$HOME/autopkgtest-master.tar --directory=$HOME
-
-    - name: Build image
-      run: |
-        sudo rm /etc/apt/preferences.d/99debian-testing
-        sudo apt update
         cd $HOME/autopkgtest-master
-        sudo ./tools/autopkgtest-build-qemu --size 12G --architecture ${{ matrix.arch }} testing $HOME/autopkgtest-testing.img
+        DEB_BUILD_OPTIONS=nocheck debuild --unsigned-source --unsigned-changes
+        sudo apt install ../autopkgtest*.deb
         cd -
 
-    - name: Build Debian package
+    - name: Build image
+      run: sudo autopkgtest-build-qemu --size 12G --architecture ${{ matrix.arch }} testing $HOME/autopkgtest-testing.img
+
+    - name: Build Debian package source
       run: |
         ./debian/rules get-orig-source
         debuild -S -sa -uc -us
@@ -66,7 +65,4 @@ jobs:
     # The increased timeout is needed because the CI can be too slow to boot
     # the image.
     - name: Run autopkgtest
-      run: |
-        cd $HOME/autopkgtest-master
-        ./runner/autopkgtest $GITHUB_WORKSPACE/../pistache_*.dsc -- ./virt/autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=4096 $HOME/autopkgtest-testing.img
-        cd -
+      run: autopkgtest ../pistache_*.dsc -- qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=4096 $HOME/autopkgtest-testing.img
