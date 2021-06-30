@@ -75,4 +75,7 @@ jobs:
     # The increased timeout is needed because the CI can be too slow to boot
     # the image.
     - name: Run autopkgtest
-      run: for retry in 1 2 3 4 5; do ((autopkgtest ../pistache_*.dsc -- qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=4096 --cpus=$(nproc) $HOME/autopkgtest-testing.img && break) || if [ retry != 5 ]; do sleep $((retry*retry)); else false; fi); done
+      run: |
+        sudo --login
+        for retry in 1 2 3 4 5; do ((autopkgtest ../pistache_*.dsc -- qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=4096 --cpus=$(nproc) $HOME/autopkgtest-testing.img && break) || if [ retry != 5 ]; do sleep $((retry*retry)); else false; fi); done
+        logout
