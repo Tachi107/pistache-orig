@@ -40,7 +40,7 @@ jobs:
     # wiki (https://wiki.debian.org/DebianRepository/UseThirdParty).
     - name: Install dependencies
       run: |
-        sudo apt install debian-archive-keyring
+        sudo apt --no-show-progress install debian-archive-keyring
         printf 'Enabled: yes\nTypes: deb\nURIs: http://deb.debian.org/debian/\nSuites: testing\nComponents: main\nSigned-By: /usr/share/keyrings/debian-archive-keyring.gpg\n' | sudo tee /etc/apt/sources.list.d/debian.sources
         printf 'Package: *\nPin: release release o=Debian,a=testing\nPin-Priority: 400\n' | sudo tee /etc/apt/preferences.d/99debian-testing
         sudo apt update
