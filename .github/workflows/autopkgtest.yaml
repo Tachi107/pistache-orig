@@ -45,6 +45,7 @@ jobs:
         printf 'Package: *\nPin: release o=Debian,a=testing\nPin-Priority: 400\n' | sudo tee /etc/apt/preferences.d/99debian-testing
         sudo apt -qq update
         sudo apt -qq autopurge '*yarn*' '*npm*' '*node*'
+        sudo rm -rf /usr/local/lib/node_modules
         sudo apt-mark hold qemu-system-gui
         sudo apt -qq install genisoimage qemu-system/testing vmdb2/testing devscripts qemu-user-static/testing && sudo apt-mark auto qemu-user-static
         sudo apt -qq build-dep .
