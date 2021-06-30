@@ -56,7 +56,7 @@ jobs:
       run: |
         mkdir --parent /tmp/autopkgtest-build
         curl --silent --output /tmp/autopkgtest-build/autopkgtest-master.tar --proto https --proto-default https --tlsv1.3 --http2-prior-knowledge https://salsa.debian.org/ci-team/autopkgtest/-/archive/master/autopkgtest-master.tar
-        sudo tar --extract --file=/tmp/autopkgtest-build/autopkgtest-master.tar --directory=/tmp/autopkgtest-build
+        tar --extract --file=/tmp/autopkgtest-build/autopkgtest-master.tar --directory=/tmp/autopkgtest-build
         cd /tmp/autopkgtest-build/autopkgtest-master
         sudo apt build-dep . --default-release=testing
         DEB_BUILD_OPTIONS=nocheck debuild --unsigned-source --unsigned-changes
