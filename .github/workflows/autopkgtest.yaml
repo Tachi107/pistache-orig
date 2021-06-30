@@ -65,7 +65,7 @@ jobs:
         rm -rf /tmp/autopkgtest-build
 
     - name: Build image
-      run: sudo autopkgtest-build-qemu --size 12G --architecture ${{ matrix.arch }} --mirror http://debian-archive.trafficmanager.net/debian/ testing $HOME/autopkgtest-testing.img
+      run: sudo autopkgtest-build-qemu --size 12G --architecture ${{ matrix.arch }} testing $HOME/autopkgtest-testing.img
 
     - name: Build Debian package source
       run: |
