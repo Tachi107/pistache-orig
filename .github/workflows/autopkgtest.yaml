@@ -77,5 +77,5 @@ jobs:
     - name: Run autopkgtest
       run: |
         sudo --login
-        for retry in 1 2 3 4 5; do ((autopkgtest --setup-commands-boot='systemctl --now enable serial-getty@hvc1.service' ../pistache_*.dsc -- qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=4096 --cpus=$(nproc) $HOME/autopkgtest-testing.img && break) || (if [ retry != 5 ]; do sleep $((retry*retry)); else false; fi)); done
+        for retry in 1 2 3 4 5; do ((autopkgtest --setup-commands-boot='systemctl --now enable serial-getty@hvc1.service' ../pistache_*.dsc -- qemu --show-boot --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=4096 --cpus=$(nproc) $HOME/autopkgtest-testing.img && break) || (if [ retry != 5 ]; do sleep $((retry*retry)); else false; fi)); done
         logout
