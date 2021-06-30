@@ -67,5 +67,5 @@ jobs:
     - name: Run autopkgtest
       run: |
         cd $HOME/autopkgtest-master
-        autopkgtest $GITHUB_WORKSPACE/../pistache_*.dsc -- ./virt/autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 $HOME/autopkgtest-testing.img
+        ./runner/autopkgtest $GITHUB_WORKSPACE/../pistache_*.dsc -- ./virt/autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 $HOME/autopkgtest-testing.img
         cd -
