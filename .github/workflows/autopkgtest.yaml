@@ -54,15 +54,15 @@ jobs:
     # an error.
     - name: Install autopkgtest from source
       run: |
-        mkdir --parent /tmp/autopkgtest-master/directory
-        curl --silent --output /tmp/autopkgtest-master/autopkgtest-master.tar --proto https --proto-default https --tlsv1.3 --http2-prior-knowledge https://salsa.debian.org/ci-team/autopkgtest/-/archive/master/autopkgtest-master.tar
-        sudo tar --extract --file=/tmp/autopkgtest-master/autopkgtest-master.tar --directory=/tmp/autopkgtest-master/directory
-        cd /tmp/autopkgtest-master/directory
+        mkdir --parent /tmp/autopkgtest-build
+        curl --silent --output /tmp/autopkgtest-build/autopkgtest-master.tar --proto https --proto-default https --tlsv1.3 --http2-prior-knowledge https://salsa.debian.org/ci-team/autopkgtest/-/archive/master/autopkgtest-master.tar
+        sudo tar --extract --file=/tmp/autopkgtest-build/autopkgtest-master.tar --directory=/tmp/autopkgtest-build
+        cd /tmp/autopkgtest-build/autopkgtest-master
         sudo apt build-dep . --default-release=testing
         DEB_BUILD_OPTIONS=nocheck debuild --unsigned-source --unsigned-changes
         sudo apt install ../autopkgtest*.deb
         cd -
-        rm -rf /tmp/autopkgtest-master
+        rm -rf /tmp/autopkgtest-build
 
     - name: Build image
       run: sudo autopkgtest-build-qemu --size 12G --architecture ${{ matrix.arch }} testing $HOME/autopkgtest-testing.img
