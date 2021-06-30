@@ -6,6 +6,7 @@ name: autopkgtest
 
 on:
   [push, pull_request]
+  paths-ignore: pistache.io/**
 
 # The default Debian shell (dash) is faster than bash at running scripts, and
 # using bash when it is not needed doesn't make sense.
