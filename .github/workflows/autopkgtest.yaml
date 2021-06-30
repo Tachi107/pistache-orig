@@ -50,6 +50,7 @@ jobs:
         curl --silent --output $HOME/autopkgtest-master.tar --proto https --proto-default https --tlsv1.3 --http2-prior-knowledge https://salsa.debian.org/ci-team/autopkgtest/-/archive/master/autopkgtest-master.tar
         sudo tar --extract --file=$HOME/autopkgtest-master.tar --directory=$HOME
         cd $HOME/autopkgtest-master
+        sudo apt build-dep .
         DEB_BUILD_OPTIONS=nocheck debuild --unsigned-source --unsigned-changes
         sudo apt install ../autopkgtest*.deb
         cd -
