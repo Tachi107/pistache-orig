@@ -85,8 +85,10 @@ jobs:
     # The increased timeout is needed because the CI can be too slow to boot
     # the image. --dpkg-architecture is needed because autopkgtest-virt-qemu
     # defaults to the host arch instead of reading it from the image.
-    # The increased ram size is needed because the default 1 GiB is not enough
-    # to build Pistache, and the extra CPU cores are not strictly needed but
+    # The ram size is set to 3840 MB because the default 1 GiB is not enough
+    # to build Pistache, the amount must be less than 4 GiB otherwise the i386
+    # image won't boot and ppc64el requires it to be aligned to 256 MiB,
+    # while the extra CPU cores are not strictly needed but
     # should speed up the compilation. Instead of explicitly calling
     # autopkgtest-virt-qemu it should be enough to just write qemu.
     # Currently this often fails on i386 with
@@ -99,4 +101,4 @@ jobs:
     # The second error can also happen on armhf, but it seems a bit more rare.
 
     - name: Run autopkgtest
-      run: autopkgtest ../pistache_*.dsc -- autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=4000 --cpus=$(nproc) $HOME/autopkgtest-testing.img
+      run: autopkgtest ../pistache_*.dsc -- autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=3840 --cpus=$(nproc) $HOME/autopkgtest-testing.img
