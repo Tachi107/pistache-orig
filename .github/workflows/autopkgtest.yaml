@@ -101,4 +101,4 @@ jobs:
     # The second error can also happen on armhf, but it seems a bit more rare.
 
     - name: Run autopkgtest
-      run: autopkgtest ../pistache_*.dsc -- autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=3840 --cpus=$(nproc) $HOME/autopkgtest-testing.img
+      run: autopkgtest ../pistache_*.dsc -- autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=3072 --cpus=$(nproc) $HOME/autopkgtest-testing.img
