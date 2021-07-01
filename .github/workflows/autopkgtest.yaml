@@ -77,4 +77,4 @@ jobs:
     # The increased timeout is needed because the CI can be too slow to boot
     # the image.
     - name: Run autopkgtest
-      run: sudo autopkgtest --setup-commands-boot='sudo systemctl --now enable serial-getty@hvc1.service' ../pistache_*.dsc -- qemu --show-boot --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=500 --ram-size=4096 --cpus=$(nproc) $HOME/autopkgtest-testing.img
+      run: sudo autopkgtest ../pistache_*.dsc -- qemu --show-boot --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=500 --ram-size=4096 --cpus=$(nproc) $HOME/autopkgtest-testing.img
