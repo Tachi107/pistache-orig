@@ -47,7 +47,7 @@ jobs:
         sudo apt -qq autopurge '*yarn*' '*npm*' '*node*'
         sudo rm -rf /usr/local/lib/node_modules
         sudo apt-mark hold qemu-system-gui
-        sudo apt -qq install genisoimage qemu-system vmdb2/testing devscripts qemu-user-static/testing ovmf-ia32 && sudo apt-mark auto qemu-user-static ovmf-ia32
+        sudo apt -qq install genisoimage qemu-system vmdb2/testing devscripts qemu-user-static ovmf-ia32 && sudo apt-mark auto qemu-user-static ovmf-ia32
         sudo apt -qq build-dep .
 
     # Build and install autopkgtest from the latest master (5.17), since
