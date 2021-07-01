@@ -105,4 +105,4 @@ jobs:
     #     through --user and -*** the guest ttyS0
 
     - name: Run autopkgtest
-      run: autopkgtest ../pistache_*.dsc -- autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=3072 --cpus=$(nproc) $HOME/autopkgtest-testing.img
+      run: autopkgtest ../pistache_*.dsc -- autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=3072 $HOME/autopkgtest-testing.img
