@@ -47,6 +47,10 @@ jobs:
     # only for arm64, but causes autopkgtest to fail for armhf and ppc64el.
     # The debian-archive.trafficmanager.net mirror is used since it is the
     # Azure mirror, and GitHub Actions run on that network.
+    # The --no-install-recommends apt option is important, as installing
+    # recommended packages causes autopkgtest to fail for arm64 and armhf;
+    # I don't know why, I don't know how, I only know that it tooks hours to
+    # figure it out.
     - name: Install dependencies
       run: |
         sudo apt -qq install debian-archive-keyring
@@ -85,20 +89,20 @@ jobs:
     # The increased timeout is needed because the CI can be too slow to boot
     # the image. --dpkg-architecture is needed because autopkgtest-virt-qemu
     # defaults to the host arch instead of reading it from the image.
-    # The ram size is set to 3840 MB because the default 1 GiB is not enough
+    # The ram size is set to 3072 MB because the default 1 GiB is not enough
     # to build Pistache, the amount must be less than 4 GiB otherwise the i386
-    # image won't boot and ppc64el requires it to be aligned to 256 MiB,
-    # while the extra CPU cores are not strictly needed but
-    # should speed up the compilation. Instead of explicitly calling
-    # autopkgtest-virt-qemu it should be enough to just write qemu.
-    # Currently this often fails on i386 with
+    # image won't boot, ppc64el requires it to be aligned to 256 MiB and an
+    # amout not convertible to a GiB integer causes arm64 to fail, while the
+    # extra CPU cores are not strictly needed but should speed up the
+    # compilation. Instead of explicitly calling autopkgtest-virt-qemu it
+    # should be enough to just write qemu.
+    # Currently this sometimes fails on i386 with
     #   <VirtSubproc>: failure: timed out waiting for 'login prompt on serial
     #     console'
-    # and on arm64 with
+    # and on arm64 and armhf with
     #   host login: <VirtSubproc>: failure: The VM does not start a root shell
     #     on ttyS1 or hvc1 already. The only other supported login mechanism is
     #     through --user and -*** the guest ttyS0
-    # The second error can also happen on armhf, but it seems a bit more rare.
 
     - name: Run autopkgtest
       run: autopkgtest ../pistache_*.dsc -- autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=3072 --cpus=$(nproc) $HOME/autopkgtest-testing.img
