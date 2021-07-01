@@ -55,8 +55,7 @@ jobs:
         sudo apt -qq update
         sudo apt -qq autopurge '*yarn*' '*npm*' '*node*'
         sudo rm -rf /usr/local/lib/node_modules
-        sudo apt-mark hold qemu-system-gui
-        sudo apt --assume-yes install genisoimage qemu-system vmdb2/testing qemu-user-static/testing ovmf-ia32 devscripts
+        sudo apt --assume-yes install genisoimage qemu-system vmdb2/testing devscripts --no-install-recommends qemu-user-static/testing qemu-efi-aarch64 qemu-efi-arm ovmf ovmf-ia32 && sudo apt-mark auto qemu-user-static qemu-efi-aarch64 qemu-efi-arm ovmf ovmf-ia32
         sudo apt -qq build-dep .
 
     # Build and install autopkgtest from the latest master (5.17), since
@@ -100,4 +99,4 @@ jobs:
     # The second error can also happen on armhf, but it seems a bit more rare.
 
     - name: Run autopkgtest
-      run: autopkgtest ../pistache_*.dsc -- autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=3000 --cpus=$(nproc) $HOME/autopkgtest-testing.img
+      run: autopkgtest ../pistache_*.dsc -- autopkgtest-virt-qemu --dpkg-architecture=${{ matrix.arch }} --timeout-reboot=120 --ram-size=4000 --cpus=$(nproc) $HOME/autopkgtest-testing.img
