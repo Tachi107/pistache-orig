@@ -102,7 +102,7 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow: abipkgdiff
-        branch: ci-abipkgdiff-master
+        branch: master
         path: ${{ env.deb_dir }}/master
         repo: pistacheio/pistache
 
@@ -110,7 +110,7 @@ jobs:
       if: github.event_name == 'push'
       uses: dawidd6/action-download-artifact@v2
       with:
-        workflow: abipkgdiff
+        workflow: abipkgdiff.yaml
         commit: ${{ steps.hash.outputs.previous }}
         name: libpistache-master-${{ steps.hash.outputs.previous }}.deb
         path: ${{ env.deb_dir }}
