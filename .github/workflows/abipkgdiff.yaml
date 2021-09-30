@@ -49,7 +49,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt -qq update
-        sudo apt -qq install abigail-tools devscripts exa
+        sudo apt -qq install abigail-tools devscripts tree
         sudo apt -qq build-dep .
 
     - name: Set commit hashes
@@ -57,6 +57,8 @@ jobs:
       run: |
         echo "::set-output name=current::$(git rev-parse --short HEAD)"
         echo "::set-output name=previous::$(git rev-parse --short HEAD~1)"
+        echo ${{ github.event.pusher.name }}
+        echo ${{ github.event.pusher.email }}
 
     # This tells uscan to download the source from the user who submitted
     # the PR instead of using upstream HEAD
@@ -75,13 +77,16 @@ jobs:
 
     - name: Build Debian package (push)
       if: github.event_name == 'push'
+      env:
+        DEBEMAIL: github.event.pusher.email
+        DEBFULLNAME: github.event.pusher.name
       run: |
         uscan
         cd ../pistache-*/
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
         cd ..
         echo "deb_dir=$(pwd)" >> $GITHUB_ENV
-        exa --tree --all
+        tree -a
         cd -
 
     - name: Upload Debian package (push)
