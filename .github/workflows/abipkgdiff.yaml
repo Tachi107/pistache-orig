@@ -82,6 +82,8 @@ jobs:
         DEBFULLNAME: ${{ github.event.pusher.name }}
       run: |
         sed --posix --in-place 's|pistacheio|Tachi107|g' debian/watch
+        sed --posix --in-place 's|HEAD|heads/ci-abipkgdiff-master|g' debian/watch
+        sed --posix --in-place 's|DPISTACHE_BUILD_TESTS=true|DPISTACHE_BUILD_TESTS=false' debian/rules
         uscan
         cd ../pistache-*/
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
