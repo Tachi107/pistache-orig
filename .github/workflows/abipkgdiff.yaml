@@ -49,7 +49,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt -qq update
-        sudo apt -qq install abigail-tools devscripts
+        sudo apt -qq install abigail-tools devscripts exa
         sudo apt -qq build-dep .
 
     - name: Set commit hashes
@@ -81,6 +81,7 @@ jobs:
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
         cd ..
         echo "deb_dir=$(pwd)" >> $GITHUB_ENV
+        exa --tree --all
         cd -
 
     - name: Upload Debian package (push)
@@ -90,7 +91,7 @@ jobs:
         name: libpistache-master-${{ steps.hash.outputs.current }}.deb
         path: |
           ${{ env.deb_dir }}/libpistache*.deb
-          debian/.debhelper/scratch-space/build-libpistache*/libpistache*.*deb
+          debian/.debhelper/scratch-space/build-libpistache[0-9]/libpistache[0-9]-dbgsym_*.*deb
 
     - name: Download previous Debian package (pull_request)
       if: github.event_name == 'pull_request'
@@ -107,7 +108,7 @@ jobs:
       with:
         workflow: abipkgdiff
         commit: ${{ steps.hash.outputs.previous }}
-        name: libpistache-${{ steps.hash.outputs.previous }}.deb
+        name: libpistache-master-${{ steps.hash.outputs.previous }}.deb
         path: ${{ env.deb_dir }}
 
     - name: Run abipkgdiff (pull_request)
