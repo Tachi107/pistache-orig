@@ -78,8 +78,8 @@ jobs:
     - name: Build Debian package (push)
       if: github.event_name == 'push'
       env:
-        DEBEMAIL: github.event.pusher.email
-        DEBFULLNAME: github.event.pusher.name
+        DEBEMAIL: ${{ github.event.pusher.email }}
+        DEBFULLNAME: ${{ github.event.pusher.name }}
       run: |
         uscan
         cd ../pistache-*/
