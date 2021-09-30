@@ -67,19 +67,21 @@ jobs:
         sed --posix --in-place 's|pistacheio|${{ github.actor }}|g' debian/watch
         sed --posix --in-place 's|HEAD|heads/${{ github.head_ref }}|g' debian/watch
         cat debian/watch
-        uscan --debug
+        uscan --verbose
         cd ../pistache-*/
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
         cd ..
         echo "deb_dir=$(pwd)" >> $GITHUB_ENV
         cd -
 
+    # TODO: Remove sed
     - name: Build Debian package (push)
       if: github.event_name == 'push'
       env:
         DEBEMAIL: ${{ github.event.pusher.email }}
         DEBFULLNAME: ${{ github.event.pusher.name }}
       run: |
+        sed --posix --in-place 's|pistacheio|Tachi107|g' debian/watch
         uscan
         cd ../pistache-*/
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
@@ -114,7 +116,8 @@ jobs:
         path: ${{ env.deb_dir }}
         workflow_conclusion: failure
 
-    - run: tree -a
+    - run: ls -lAh
+      working-directory: ${{ env.deb_dir }}
 
     - name: Run abipkgdiff (pull_request)
       if: github.event_name == 'pull_request'
