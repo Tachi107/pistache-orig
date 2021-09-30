@@ -90,7 +90,7 @@ jobs:
         name: libpistache-master-${{ steps.hash.outputs.current }}.deb
         path: |
           ${{ env.deb_dir }}/libpistache*.deb
-          debian/.debhelper/scratch-space/build-libpistache*/libpistache*.deb*
+          debian/.debhelper/scratch-space/build-libpistache*/libpistache*.*deb
 
     - name: Download previous Debian package (pull_request)
       if: github.event_name == 'pull_request'
@@ -114,8 +114,8 @@ jobs:
       if: github.event_name == 'pull_request'
       working-directory: ${{ env.deb_dir }}
       run: abipkgdiff \
-           --debug-info-pkg1 master/libpistache[0-9]-dbgsym_*.deb* \
-           --debug-info-pkg2        libpistache[0-9]-dbgsym_*.deb* \
+           --debug-info-pkg1 master/libpistache[0-9]-dbgsym_*.*deb \
+           --debug-info-pkg2        libpistache[0-9]-dbgsym_*.*deb \
            --devel-pkg1      master/libpistache-dev_*.deb \
            --devel-pkg2             libpistache-dev_*.deb \
            master/libpistache[0-9]_*.deb \
@@ -125,8 +125,8 @@ jobs:
       if: github.event_name == 'push'
       working-directory: ${{ env.deb_dir }}
       run: abipkgdiff \
-           --debug-info-pkg1 libpistache[0-9]-dbgsym_*${{ steps.hash.outputs.previous }}*.deb* \
-           --debug-info-pkg2 libpistache[0-9]-dbgsym_*${{ steps.hash.outputs.current  }}*.deb* \
+           --debug-info-pkg1 libpistache[0-9]-dbgsym_*${{ steps.hash.outputs.previous }}*.*deb \
+           --debug-info-pkg2 libpistache[0-9]-dbgsym_*${{ steps.hash.outputs.current  }}*.*deb \
            --devel-pkg1      libpistache-dev_*${{ steps.hash.outputs.previous }}*.deb \
            --devel-pkg2      libpistache-dev_*${{ steps.hash.outputs.current  }}*.deb \
            libpistache[0-9]_*${{ steps.hash.outputs.previous }}*.deb \
