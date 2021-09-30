@@ -1,0 +1,131 @@
+# SPDX-FileCopyrightText: 2021 Andrea Pappacoda <andrea@pappacoda.it>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# TODO
+# Instead of downloading the artifact of the previous run (likely impossible)
+# I should download the artifact from the latest master. I probably can do
+# this only using the API, see linked issue.
+# https://github.com/actions/download-artifact/issues/3
+# 
+# I can use https://github.com/marketplace/actions/download-workflow-artifact
+# to download the artifact.
+# This Action should download different things when it is invoked by a PR vs
+# when it is invoked by a commit on the main branch. When part of a PR it
+# should compare the PR code with the latest master, and when run from the
+# master branch it should compare the latest commit with the previous
+
+name: abipkgdiff
+
+on:
+  push:
+    branches: ci-abipkgdiff-master
+    paths-ignore: pistache.io/**
+  pull_request:
+    paths-ignore: pistache.io/**
+
+# The default Debian shell (dash) is faster than bash at running scripts, and
+# using bash when it is not needed doesn't make sense.
+defaults:
+  run:
+    shell: sh
+
+jobs:
+  abi:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - name: Checkout Debian data
+      uses: actions/checkout@v2
+      with:
+        ref: debian
+        path: debian
+
+    - name: Install dependencies
+      run: |
+        sudo apt -qq update
+        sudo apt -qq install abigail-tools devscripts
+        sudo apt -qq build-dep .
+
+    - name: Set commit hashes
+      id: hash
+      run: |
+        echo "::set-output name=current::$(git rev-parse --short HEAD)"
+        echo "::set-output name=previous::$(git rev-parse --short HEAD~1)"
+
+    # This tells uscan to download the source from the user who submitted
+    # the PR instead of using upstream HEAD
+    - name: Build Debian package (pull_request)
+      if: github.event_name == 'pull_request'
+      run: |
+        sed --posix --in-place 's|pistacheio|${{ github.actor }}|g' debian/watch
+        sed --posix --in-place 's|HEAD|heads/${{ github.head_ref }}|g' debian/watch
+        cat debian/watch
+        uscan --debug
+        cd ../pistache-*/
+        DEB_BUILD_OPTIONS=nocheck debuild -uc -us
+        cd ..
+        echo "deb_dir=$(pwd)" >> $GITHUB_ENV
+        cd -
+
+    - name: Build Debian package (push)
+      if: github.event_name == 'push'
+      run: |
+        uscan
+        cd ../pistache-*/
+        DEB_BUILD_OPTIONS=nocheck debuild -uc -us
+        cd ..
+        echo "deb_dir=$(pwd)" >> $GITHUB_ENV
+        cd -
+
+    - name: Upload Debian package (push)
+      if: github.event_name == 'push'
+      uses: actions/upload-artifact@v2
+      with:
+        name: libpistache-master-${{ steps.hash.outputs.current }}.deb
+        path: ${{ env.deb_dir }}/*.deb
+
+    - name: Download previous Debian package (pull_request)
+      if: github.event_name == 'pull_request'
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: abipkgdiff
+        branch: master
+        path: ${{ env.deb_dir }}/master
+        repo: pistacheio/pistache
+
+    - name: Download previous Debian package (push)
+      if: github.event_name == 'push'
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: abipkgdiff
+        commit: ${{ steps.hash.outputs.previous }}
+        name: libpistache-${{ steps.hash.outputs.previous }}.deb
+        path: ${{ env.deb_dir }}
+
+    - name: Run abipkgdiff (pull_request)
+      if: github.event_name == 'pull_request'
+      working-directory: ${{ env.deb_dir }}
+      run: abipkgdiff \
+           --debug-info-pkg1 master/libpistache[0-9]-dbgsym_*.deb \
+           --debug-info-pkg2        libpistache[0-9]-dbgsym_*.deb \
+           --devel-pkg1      master/libpistache-dev_*.deb \
+           --devel-pkg2             libpistache-dev_*.deb \
+           master/libpistache[0-9]_*.deb \
+                  libpistache[0-9]_*.deb
+
+    - name: Run abipkgdiff (push)
+      if: github.event_name == 'push'
+      working-directory: ${{ env.deb_dir }}
+      run: abipkgdiff \
+           --debug-info-pkg1 libpistache[0-9]-dbgsym_*${{ steps.hash.outputs.previous }}*.deb \
+           --debug-info-pkg2 libpistache[0-9]-dbgsym_*${{ steps.hash.outputs.current  }}*.deb \
+           --devel-pkg1      libpistache-dev_*${{ steps.hash.outputs.previous }}*.deb \
+           --devel-pkg2      libpistache-dev_*${{ steps.hash.outputs.current  }}*.deb \
+           libpistache[0-9]_*${{ steps.hash.outputs.previous }}*.deb \
+           libpistache[0-9]_*${{ steps.hash.outputs.current  }}*.deb
