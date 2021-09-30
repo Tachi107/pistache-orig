@@ -57,8 +57,7 @@ jobs:
       run: |
         echo "::set-output name=current::$(git rev-parse --short HEAD)"
         echo "::set-output name=previous::$(git rev-parse --short HEAD~1)"
-        echo ${{ github.event.pusher.name }}
-        echo ${{ github.event.pusher.email }}
+        echo "::set-output name=previous_long::$(git rev-parse HEAD~1)"
 
     # This tells uscan to download the source from the user who submitted
     # the PR instead of using upstream HEAD
@@ -111,7 +110,7 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow: abipkgdiff.yaml
-        commit: ${{ steps.hash.outputs.previous }}
+        commit: ${{ steps.hash.outputs.previous_long }}
         name: libpistache-master-${{ steps.hash.outputs.previous }}.deb
         path: ${{ env.deb_dir }}
 
