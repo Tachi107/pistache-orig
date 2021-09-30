@@ -95,7 +95,7 @@ jobs:
       with:
         name: libpistache-master-${{ steps.hash.outputs.current }}.deb
         path: |
-          ${{ env.deb_dir }}/libpistache*.{,d}deb
+          ${{ env.deb_dir }}/libpistache*.[,d]deb
 
     - name: Download previous Debian package (pull_request)
       if: github.event_name == 'pull_request'
