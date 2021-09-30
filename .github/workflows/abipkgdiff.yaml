@@ -113,6 +113,7 @@ jobs:
         commit: ${{ steps.hash.outputs.previous_long }}
         name: libpistache-master-${{ steps.hash.outputs.previous }}.deb
         path: ${{ env.deb_dir }}
+        workflow_conclusion: failure
 
     - name: Run abipkgdiff (pull_request)
       if: github.event_name == 'pull_request'
