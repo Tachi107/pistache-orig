@@ -102,7 +102,7 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow: abipkgdiff
-        branch: master
+        branch: ci-abipkgdiff-master
         path: ${{ env.deb_dir }}/master
         repo: pistacheio/pistache
 
