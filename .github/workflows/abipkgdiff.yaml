@@ -126,8 +126,9 @@ jobs:
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
 
     # TODO: Remove sed
-    - name: Build Debian package (push)
+    - name: Build current Debian package (push)
       if: github.event_name == 'push'
+      working-directory: current
       env:
         DEBEMAIL: ${{ github.event.pusher.email }}
         DEBFULLNAME: ${{ github.event.pusher.name }}
