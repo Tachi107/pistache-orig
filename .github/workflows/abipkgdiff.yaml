@@ -14,6 +14,13 @@
 # when it is invoked by a commit on the main branch. When part of a PR it
 # should compare the PR code with the latest master, and when run from the
 # master branch it should compare the latest commit with the previous
+#
+# I could use uscan twice. This works for pull requests but doesn't for push
+# on master, because uscan can only download the latest commit of a specific
+# branch or a tag. To build the current package in PRs I first edit d/watch
+# to point to the contributor's repo and to the PR branch so that it
+# downloads that source, and then repeat without editing d/watch, because it
+# already points to the correct "previous" commit, that is the main branch.
 
 name: abipkgdiff
 
@@ -35,44 +42,89 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: Checkout current
       uses: actions/checkout@v2
       with:
+        path: current
         fetch-depth: 2
 
-    - name: Checkout Debian data
+    - name: Set current commit hash
+      id: hash_current
+      working-directory: current
+      run: |
+        echo "::set-output name=long::$(git rev-parse HEAD)"
+        echo "::set-output name=short::$(git rev-parse --short HEAD)"
+
+    - name: Set previous commit hash (push)
+      if: github.event_name == 'push'
+      id: hash_previous
+      working-directory: current
+      run: |
+        echo "::set-output name=long::$(git rev-parse HEAD~1)"
+        echo "::set-output name=short::$(git rev-parse --short HEAD~1)"
+
+    - name: Checkout previous (push)
+      if: github.event_name == 'push'
+      uses: actions/checkout@v2
+      with:
+        path: previous
+        ref: ${{ steps.hash.outputs.previous }}
+
+    - name: Checkout previous (pull_request)
+      if: github.event_name == 'pull_request'
+      uses: actions/checkout@v2
+      with:
+        path: previous
+        ref: master
+        repository: pistacheio/pistache
+
+    - name: Set previous commit hash (pull_request)
+      if: github.event_name == 'pull_request'
+      id: hash_previous
+      working-directory: previous
+      run: |
+        echo "::set-output name=long::$(git rev-parse HEAD)"
+        echo "::set-output name=short::$(git rev-parse --short HEAD)"
+
+    - name: Checkout Debian data in current
       uses: actions/checkout@v2
       with:
         ref: debian
-        path: debian
+        path: current/debian
+
+    - name: Checkout Debian data in previous
+      uses: actions/checkout@v2
+      with:
+        ref: debian
+        path: previous/debian
 
     - name: Install dependencies
+      working-directory: current
       run: |
         sudo apt -qq update
         sudo apt -qq install abigail-tools devscripts tree
         sudo apt -qq build-dep .
 
-    - name: Set commit hashes
-      id: hash
-      run: |
-        echo "::set-output name=current::$(git rev-parse --short HEAD)"
-        echo "::set-output name=previous::$(git rev-parse --short HEAD~1)"
-        echo "::set-output name=previous_long::$(git rev-parse HEAD~1)"
-
     # This tells uscan to download the source from the user who submitted
     # the PR instead of using upstream HEAD
-    - name: Build Debian package (pull_request)
+    - name: Build current Debian package (pull_request)
       if: github.event_name == 'pull_request'
+      working-directory: current
       run: |
         sed --posix --in-place 's|pistacheio|${{ github.actor }}|g' debian/watch
         sed --posix --in-place 's|HEAD|heads/${{ github.head_ref }}|g' debian/watch
         cat debian/watch
         uscan --verbose
-        cd ../pistache-*/
+        cd ../pistache-*+git*.${{ steps.hash_current.outputs.short }}/
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
-        cd ..
-        echo "deb_dir=$(pwd)" >> $GITHUB_ENV
-        cd -
+
+    - name: Build previous Debian package (pull_request)
+      if: github.event_name == 'pull_request'
+      working-directory: previous
+      run: |
+        uscan --verbose
+        cd ../pistache-*+git*.${{ steps.hash_previous.outputs.short }}/
+        DEB_BUILD_OPTIONS=nocheck debuild -uc -us
 
     # TODO: Remove sed
     - name: Build Debian package (push)
@@ -91,54 +143,13 @@ jobs:
         echo "deb_dir=$(pwd)" >> $GITHUB_ENV
         cd -
 
-    - name: Upload Debian package (push)
-      if: github.event_name == 'push'
-      uses: actions/upload-artifact@v2
-      with:
-        name: libpistache-master-${{ steps.hash.outputs.current }}.deb
-        path: |
-          ${{ env.deb_dir }}/libpistache*.*deb
-
-    - name: Download previous Debian package (pull_request)
-      if: github.event_name == 'pull_request'
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        workflow: abipkgdiff
-        branch: master
-        path: ${{ env.deb_dir }}/master
-        repo: pistacheio/pistache
-
-    - name: Download previous Debian package (push)
-      if: github.event_name == 'push'
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        workflow: abipkgdiff.yaml
-        commit: ${{ steps.hash.outputs.previous_long }}
-        name: libpistache-master-${{ steps.hash.outputs.previous }}.deb
-        path: ${{ env.deb_dir }}
-        workflow_conclusion: failure
-
     - run: ls -lAh
-      working-directory: ${{ env.deb_dir }}
 
-    - name: Run abipkgdiff (pull_request)
-      if: github.event_name == 'pull_request'
-      working-directory: ${{ env.deb_dir }}
-      run: abipkgdiff \
-           --debug-info-pkg1 master/libpistache[0-9]-dbgsym_*.*deb \
-           --debug-info-pkg2        libpistache[0-9]-dbgsym_*.*deb \
-           --devel-pkg1      master/libpistache-dev_*.deb \
-           --devel-pkg2             libpistache-dev_*.deb \
-           master/libpistache[0-9]_*.deb \
-                  libpistache[0-9]_*.deb
-
-    - name: Run abipkgdiff (push)
-      if: github.event_name == 'push'
-      working-directory: ${{ env.deb_dir }}
+    - name: Run abipkgdiff
       run: abipkgdiff
-           --debug-info-pkg1 libpistache[0-9]-dbgsym_*${{ steps.hash.outputs.previous }}*.*deb
-           --debug-info-pkg2 libpistache[0-9]-dbgsym_*${{ steps.hash.outputs.current  }}*.*deb
-           --devel-pkg1      libpistache-dev_*${{ steps.hash.outputs.previous }}*.deb
-           --devel-pkg2      libpistache-dev_*${{ steps.hash.outputs.current  }}*.deb
-           libpistache[0-9]_*${{ steps.hash.outputs.previous }}*.deb
-           libpistache[0-9]_*${{ steps.hash.outputs.current  }}*.deb
+           --debug-info-pkg1 libpistache[0-9]-dbgsym_*${{ steps.hash_previous.outputs.short }}*.*deb
+           --debug-info-pkg2 libpistache[0-9]-dbgsym_*${{ steps.hash_current.outputs.short  }}*.*deb
+           --devel-pkg1      libpistache-dev_*${{ steps.hash_previous.outputs.short }}*.deb
+           --devel-pkg2      libpistache-dev_*${{ steps.hash_current.outputs.short  }}*.deb
+           libpistache[0-9]_*${{ steps.hash_previous.outputs.short }}*.deb
+           libpistache[0-9]_*${{ steps.hash_current.outputs.short  }}*.deb
