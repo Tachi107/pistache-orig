@@ -52,16 +52,16 @@ jobs:
       id: hash_current
       working-directory: current
       run: |
-        echo "::set-output name=long::$(git rev-parse HEAD)"
-        echo "::set-output name=short::$(git rev-parse --short HEAD)"
+        echo "hash_current_long=$(git rev-parse HEAD)" >> $GITHUB_ENV
+        echo "hash_current_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: Set previous commit hash (push)
       if: github.event_name == 'push'
       id: hash_previous
       working-directory: current
       run: |
-        echo "::set-output name=long::$(git rev-parse HEAD~1)"
-        echo "::set-output name=short::$(git rev-parse --short HEAD~1)"
+        echo "hash_previous_long=$(git rev-parse HEAD~1)" >> $GITHUB_ENV
+        echo "hash_previous_short=$(git rev-parse --short HEAD~1)" >> $GITHUB_ENV
 
     - name: Checkout previous (push)
       if: github.event_name == 'push'
@@ -80,11 +80,10 @@ jobs:
 
     - name: Set previous commit hash (pull_request)
       if: github.event_name == 'pull_request'
-      id: hash_previous
       working-directory: previous
       run: |
-        echo "::set-output name=long::$(git rev-parse HEAD)"
-        echo "::set-output name=short::$(git rev-parse --short HEAD)"
+        echo "hash_previous_long=$(git rev-parse HEAD)" >> $GITHUB_ENV
+        echo "hash_previous_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: Checkout Debian data in current
       uses: actions/checkout@v2
@@ -115,7 +114,7 @@ jobs:
         sed --posix --in-place 's|HEAD|heads/${{ github.head_ref }}|g' debian/watch
         cat debian/watch
         uscan --verbose
-        cd ../pistache-*+git*.${{ steps.hash_current.outputs.short }}/
+        cd ../pistache-*+git*.${{ env.hash_current_short }}/
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
 
     - name: Build previous Debian package (pull_request)
@@ -123,7 +122,7 @@ jobs:
       working-directory: previous
       run: |
         uscan --verbose
-        cd ../pistache-*+git*.${{ steps.hash_previous.outputs.short }}/
+        cd ../pistache-*+git*.${{ env.hash_previous_short }}/
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
 
     # TODO: Remove sed
@@ -139,7 +138,6 @@ jobs:
         uscan
         cd ../pistache-*/
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
-        cd ..
         echo "deb_dir=$(pwd)" >> $GITHUB_ENV
         cd -
 
@@ -147,9 +145,9 @@ jobs:
 
     - name: Run abipkgdiff
       run: abipkgdiff
-           --debug-info-pkg1 libpistache[0-9]-dbgsym_*${{ steps.hash_previous.outputs.short }}*.*deb
-           --debug-info-pkg2 libpistache[0-9]-dbgsym_*${{ steps.hash_current.outputs.short  }}*.*deb
-           --devel-pkg1      libpistache-dev_*${{ steps.hash_previous.outputs.short }}*.deb
-           --devel-pkg2      libpistache-dev_*${{ steps.hash_current.outputs.short  }}*.deb
-           libpistache[0-9]_*${{ steps.hash_previous.outputs.short }}*.deb
-           libpistache[0-9]_*${{ steps.hash_current.outputs.short  }}*.deb
+           --debug-info-pkg1 libpistache[0-9]-dbgsym_*${{ env.hash_previous_short }}*.*deb
+           --debug-info-pkg2 libpistache[0-9]-dbgsym_*${{ env.hash_current_short  }}*.*deb
+           --devel-pkg1      libpistache-dev_*${{ env.hash_previous_short }}*.deb
+           --devel-pkg2      libpistache-dev_*${{ env.hash_current_short  }}*.deb
+           libpistache[0-9]_*${{ env.hash_previous_short }}*.deb
+           libpistache[0-9]_*${{ env.hash_current_short  }}*.deb
