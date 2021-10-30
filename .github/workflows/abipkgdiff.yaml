@@ -116,7 +116,7 @@ jobs:
         sed --posix --in-place 's|pistacheio|${{ github.actor }}|g' debian/watch
         sed --posix --in-place 's|HEAD|heads/${{ github.head_ref }}|g' debian/watch
         uscan
-        cd ../pistache-*+git*.${{ env.hash_current_short }}/
+        cd ../pistache-*\~git*.${{ env.hash_current_short }}/
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
 
     - name: Build previous Debian package (pull_request)
@@ -124,7 +124,7 @@ jobs:
       working-directory: previous
       run: |
         uscan
-        cd ../pistache-*+git*.${{ env.hash_previous_short }}/
+        cd ../pistache-*\~git*.${{ env.hash_previous_short }}/
         DEB_BUILD_OPTIONS=nocheck debuild -uc -us
 
     - name: Build current Debian package (push)
