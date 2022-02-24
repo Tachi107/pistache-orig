@@ -57,6 +57,7 @@ jobs:
 
     - name: Build image
       run: |
+        debootstrap --arch arm64 testing $(mktemp --directory)
         autopkgtest-build-qemu --architecture ${{ matrix.arch }} --size 12G testing $HOME/autopkgtest-testing.img || exit_status=$?
         cat /tmp/tmp*/debootstrap/debootstrap.log
         exit $exit_status
