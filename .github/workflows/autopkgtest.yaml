@@ -51,7 +51,10 @@ jobs:
       run: apt -y build-dep . --no-install-recommends
 
     - name: Build image
-      run: autopkgtest-build-qemu --architecture ${{ matrix.arch }} --size 12G testing $HOME/autopkgtest-testing.img
+      run: |
+        autopkgtest-build-qemu --architecture ${{ matrix.arch }} --size 12G testing $HOME/autopkgtest-testing.img || exit_status=$?
+        echo /tmp/tmp*/debootstrap/debootstrap.log
+        exit $exit_status
 
     - name: Build Debian package source
       run: |
