@@ -29,9 +29,6 @@ jobs:
         arch: [ amd64, arm64, armhf, i386, ppc64el ] # , s390x
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
     # The Debian repository is needed by autopkgtest-build-qemu when building
     # for foreign architectures, since the tool tries to install
     # linux-image-${{ matrix.arch }}, that is unavailable on Ubuntu; adding
@@ -58,7 +55,10 @@ jobs:
     - name: Install dependencies
       run: |
         apt -y update
-        apt -y install autopkgtest genisoimage qemu-system vmdb2 devscripts --no-install-recommends qemu-user-static qemu-efi-aarch64 qemu-efi-arm ovmf ovmf-ia32 && apt-mark auto qemu-user-static qemu-efi-aarch64 qemu-efi-arm ovmf ovmf-ia32
+        apt -y install autopkgtest genisoimage qemu-system vmdb2 devscripts git --no-install-recommends qemu-user-static qemu-efi-aarch64 qemu-efi-arm ovmf ovmf-ia32 && apt-mark auto qemu-user-static qemu-efi-aarch64 qemu-efi-arm ovmf ovmf-ia32
+
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Checkout Debian data
       uses: actions/checkout@v2
@@ -67,7 +67,7 @@ jobs:
         path: debian
 
     - name: Install build-deps
-      run: apt -y build-dep .
+      run: apt -y build-dep . --no-install-recommends
 
     - name: Build image
       run: autopkgtest-build-qemu --architecture ${{ matrix.arch }} --size 12G testing $HOME/autopkgtest-testing.img
