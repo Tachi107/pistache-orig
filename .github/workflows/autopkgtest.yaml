@@ -29,25 +29,6 @@ jobs:
         arch: [ amd64, arm64, armhf, i386, ppc64el ] # , s390x
 
     steps:
-    # The Debian repository is needed by autopkgtest-build-qemu when building
-    # for foreign architectures, since the tool tries to install
-    # linux-image-${{ matrix.arch }}, that is unavailable on Ubuntu; adding
-    # the Debian Testing repo and lowering its priority solves the issue
-    # while not risking to break the system mixing Debian and Ubuntu pkgs.
-    # The pgp key required to use the repository is downloaded through the
-    # debain-archive-keyring package, and instead of using the deprecated
-    # apt-key utility to add the keyring to the trusted ones I use the
-    # Signed-By option (deb822 source format), as recommended in the Debian
-    # wiki (https://wiki.debian.org/DebianRepository/UseThirdParty).
-    # Node.js stuff is purged since it is not needed and for whatever reason
-    # causes a warning to be generated when building autopkgtest.
-    # Also qemu-system-gui is holded to prevent installation since it is not
-    # needed, and both vmdb2 and qemu-user-static are installed from testing
-    # because the version available in Ubuntu does not work; the old vmdb2
-    # causes image generation failures for all architectures, qemu-user-static
-    # only for arm64, but causes autopkgtest to fail for armhf and ppc64el.
-    # The debian-archive.trafficmanager.net mirror is used since it is the
-    # Azure mirror, and GitHub Actions run on that network.
     # The --no-install-recommends apt option is important, as installing
     # recommended packages causes autopkgtest to fail for arm64 and armhf;
     # I don't know why, I don't know how, I only know that it tooks hours to
@@ -55,7 +36,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt -y update
-        apt -y install autopkgtest genisoimage qemu-system vmdb2 devscripts git --no-install-recommends qemu-user-static qemu-efi-aarch64 qemu-efi-arm ovmf ovmf-ia32 && apt-mark auto qemu-user-static qemu-efi-aarch64 qemu-efi-arm ovmf ovmf-ia32
+        apt -y install autopkgtest genisoimage qemu-system vmdb2 devscripts git
 
     - name: Checkout
       uses: actions/checkout@v2
