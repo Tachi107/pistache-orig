@@ -32,6 +32,7 @@ jobs:
         export DEBFULLNAME=$(grep '^Maintainer:' control | cut -d : -f 2 | cut -d '<' -f 1 | xargs echo)
         export DEBEMAIL=$(grep '^Maintainer:' control | cut -d '<' -f 2 | tr -d '>')
         xargs -I version dch -v version-1 -c changelog '' < version.txt
+        cat changelog
       env:
         TZ: UTC0
 
